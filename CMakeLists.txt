@@ -62,29 +62,13 @@ endif()
 set(HAVE_X11 ${X11_FOUND})
 set(HAVE_XRES ${X11_XRes_FOUND})
 set(HAVE_QTWEBKITWIDGETS ${Qt5WebKitWidgets_FOUND})
-configure_file(config-ksysguard.h.cmake ${CMAKE_CURRENT_BINARY_DIR}/config-ksysguard.h )
 
 add_subdirectory( processcore )
 
 if(BUILD_TESTING)
-    add_subdirectory( tests )
+    # add_subdirectory( tests )
 endif()
 
-install(DIRECTORY scripts/ DESTINATION ${DATA_INSTALL_DIR}/ksysguard/scripts)
-
 set(CMAKECONFIG_INSTALL_DIR ${LIB_INSTALL_DIR}/cmake/KF5SysGuard)
-ecm_configure_package_config_file(KF5SysGuardConfig.cmake.in
-    "${CMAKE_CURRENT_BINARY_DIR}/KF5SysGuardConfig.cmake"
-    INSTALL_DESTINATION ${CMAKECONFIG_INSTALL_DIR})
-
-install(FILES
-		${CMAKE_CURRENT_BINARY_DIR}/KF5SysGuardConfig.cmake
-		${CMAKE_CURRENT_BINARY_DIR}/KF5SysGuardConfigVersion.cmake
-        DESTINATION ${CMAKECONFIG_INSTALL_DIR})
-
-install(EXPORT libksysguardLibraryTargets
-        NAMESPACE KF5::
-        DESTINATION ${CMAKECONFIG_INSTALL_DIR}
-        FILE KF5SysGuardLibraryTargets.cmake )
 
 feature_summary(WHAT ALL INCLUDE_QUIET_PACKAGES FATAL_ON_MISSING_REQUIRED_PACKAGES)
