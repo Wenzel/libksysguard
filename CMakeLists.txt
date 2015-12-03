@@ -64,14 +64,10 @@ set(HAVE_XRES ${X11_XRes_FOUND})
 set(HAVE_QTWEBKITWIDGETS ${Qt5WebKitWidgets_FOUND})
 configure_file(config-ksysguard.h.cmake ${CMAKE_CURRENT_BINARY_DIR}/config-ksysguard.h )
 
-add_subdirectory( lsofui )
 add_subdirectory( processcore )
-add_subdirectory( processui )
-add_subdirectory( signalplotter )
-add_subdirectory( ksgrd )
 
 if(BUILD_TESTING)
-add_subdirectory( tests )
+    add_subdirectory( tests )
 endif()
 
 install(DIRECTORY scripts/ DESTINATION ${DATA_INSTALL_DIR}/ksysguard/scripts)
