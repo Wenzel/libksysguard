@@ -1,30 +1,18 @@
 cmake_minimum_required(VERSION 2.8.12 FATAL_ERROR)
 
-project(libksysguard)
+project(libksysguard CXX)
 set(PROJECT_VERSION "5.5.90")
 set(PROJECT_VERSION_MAJOR 5)
 
-include(FeatureSummary)
-include(WriteBasicConfigVersionFile)
 
+#-----------------------------------------------------------------------------
+#                              DEPENDENCIES
+#-----------------------------------------------------------------------------
 find_package(ECM 1.2.0 REQUIRED NO_MODULE)
 set(CMAKE_MODULE_PATH ${ECM_MODULE_PATH} ${ECM_KDE_MODULE_DIR})
 
-find_package(Qt5 REQUIRED CONFIG COMPONENTS DBus Network Widgets Script)
-find_package(Qt5WebKitWidgets CONFIG)
-set_package_properties(Qt5WebKitWidgets PROPERTIES
-                       URL "git://gitorious.org/qt/qtwebkit.git"
-                       DESCRIPTION "Qt Webkit module (web browsing engine)"
-                       TYPE OPTIONAL
-                       PURPOSE "Used by the HTML-based GUI ksysguard library"
-                      )
-
-find_package(KF5 REQUIRED COMPONENTS CoreAddons Config I18n WindowSystem Completion Auth WidgetsAddons IconThemes ConfigWidgets Service Plasma)
+find_package(KF5 REQUIRED COMPONENTS Auth I18n)
 find_package(ZLIB REQUIRED)
-set_package_properties(ZLIB PROPERTIES DESCRIPTION "Support for gzip compressed files and data streams"
-                       URL "http://www.zlib.net"
-                       TYPE REQUIRED
-                      )
 
 include(KDEInstallDirs)
 include(KDECMakeSettings)
@@ -42,33 +30,36 @@ ecm_setup_version(${PROJECT_VERSION}
                   PACKAGE_VERSION_FILE "${CMAKE_CURRENT_BINARY_DIR}/KF5SysGuardConfigVersion.cmake"
                   SOVERSION 7
 )
+#-----------------------------------------------------------------------------
+#                           BUILD TYPES & FLAGS
+#-----------------------------------------------------------------------------
+set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wall -Wextra -std=c++11 -fdiagnostics-color")
+set(CMAKE_CXX_FLAGS_DEBUG "${CMAKE_CXX_FLAGS_DEBUG} -g3 -O0")
+set(CMAKE_CXX_FLAGS_RELEASE "${CMAKE_CXX_FLAGS_RELEASE} -Werror -O2")
 
-find_package(X11)
-set_package_properties(X11 PROPERTIES DESCRIPTION "X11 libraries"
-                        URL "http://www.x.org"
-                        TYPE OPTIONAL
-                        PURPOSE "Required for building the X11 based workspace"
-                    )
-if(X11_FOUND)
-    find_package(Qt5X11Extras REQUIRED)
-    find_library(X11_XRes_LIB XRes ${X11_LIB_SEARCH_PATH})
-    find_path(X11_XRes_INCLUDE_PATH X11/extensions/XRes.h ${X11_INC_SEARCH_PATH})
-
-    if(X11_XRes_LIB AND X11_XRes_INCLUDE_PATH)
-        set(X11_XRes_FOUND TRUE)
-    endif()
+# strip binary in release mode
+if(CMAKE_BUILD_TYPE MATCHES "RELEASE")
+    set(CMAKE_EXE_LINKER_FLAGS "-s")
 endif()
 
-set(HAVE_X11 ${X11_FOUND})
-set(HAVE_XRES ${X11_XRes_FOUND})
-set(HAVE_QTWEBKITWIDGETS ${Qt5WebKitWidgets_FOUND})
-
+#-----------------------------------------------------------------------------
+#                               SOURCES
+#-----------------------------------------------------------------------------
 add_subdirectory( processcore )
 
+#-----------------------------------------------------------------------------
+#                               TESTS
+#-----------------------------------------------------------------------------
 if(BUILD_TESTING)
     # add_subdirectory( tests )
 endif()
 
-set(CMAKECONFIG_INSTALL_DIR ${LIB_INSTALL_DIR}/cmake/KF5SysGuard)
-
+#-----------------------------------------------------------------------------
+#                               SUMMARY
+#-----------------------------------------------------------------------------
+message(STATUS " ↳ Compiler     → ${CMAKE_CXX_COMPILER}")
+message(STATUS " ↳ Prefix       → ${CMAKE_INSTALL_PREFIX}")
+message(STATUS " ↳ Build        → ${CMAKE_BUILD_TYPE}")
+message(STATUS " ↳ CXX Flags    → ${CMAKE_CXX_FLAGS}")
+include(FeatureSummary)
 feature_summary(WHAT ALL INCLUDE_QUIET_PACKAGES FATAL_ON_MISSING_REQUIRED_PACKAGES)
